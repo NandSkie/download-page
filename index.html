@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Redirecting...</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            color: #333;
+            flex-direction: column;
+        }
+        .message {
+            font-size: 1.2rem;
+            margin-bottom: 10px;
+        }
+    </style>
+    <script>
+        // Fungsi redirect setelah 3 detik (3000 ms)
+        setTimeout(function() {
+            window.location.href = "https://nandski.github.io";
+        }, 3000);
+    </script>
+</head>
+<body>
+    <div class="message">Sedang diarahkan ke website...</div>
+    <div class="countdown">3 detik tersisa</div>
+
+    <script>
+        // Countdown animasi
+        let seconds = 3;
+        const countdownEl = document.querySelector('.countdown');
+        const interval = setInterval(() => {
+            seconds--;
+            if(seconds > 0) {
+                countdownEl.textContent = seconds + " detik tersisa";
+            } else {
+                clearInterval(interval);
+                countdownEl.textContent = "Mengalihkan sekarang...";
+            }
+        }, 1000);
+    </script>
+</body>
+      </html>
