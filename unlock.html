@@ -1,0 +1,701 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Unlock System | Sub4Sub</title>
+    <!-- Font Awesome 6 (CDN) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        :root {
+            --neon-blue: #0ff;
+            --dark-bg: #0a0a1a;
+            --card-bg: rgba(20, 20, 40, 0.9);
+            --text-color: #e0e0ff;
+            --btn-primary: #2563eb;
+            --btn-hover: #3b82f6;
+            --btn-complete: #10b981;
+            --accent-purple: #8b5cf6;
+        }
+
+        body {
+            background-color: var(--dark-bg);
+            color: var(--text-color);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 15px;
+            overflow-x: hidden;
+            position: relative;
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(0, 100, 255, 0.05) 0%, transparent 20%),
+                radial-gradient(circle at 90% 80%, rgba(139, 92, 246, 0.05) 0%, transparent 20%);
+        }
+
+        .meteor {
+            position: fixed;
+            width: 1px;
+            height: 40px;
+            background: linear-gradient(to bottom, transparent, rgba(255, 255, 255, 0.8));
+            border-radius: 50%;
+            opacity: 0;
+            filter: blur(0.5px);
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        .container {
+            max-width: 500px;
+            width: 100%;
+            background: var(--card-bg);
+            backdrop-filter: blur(10px);
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+            padding: 20px;
+            text-align: center;
+            position: relative;
+            z-index: 2;
+        }
+
+        .header {
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        h1 {
+            font-size: 1.8rem;
+            margin-bottom: 5px;
+            background: linear-gradient(to right, var(--neon-blue), var(--accent-purple));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .subtitle {
+            font-size: 0.9rem;
+            opacity: 0.8;
+            margin-bottom: 10px;
+        }
+
+        .warning {
+            background: rgba(255, 193, 7, 0.1);
+            border: 1px solid rgba(255, 193, 7, 0.3);
+            border-radius: 6px;
+            padding: 10px;
+            font-size: 0.85rem;
+            margin-bottom: 15px;
+            color: #ffd700;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .progress-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin: 15px 0;
+            background: rgba(0, 0, 0, 0.2);
+            padding: 8px 12px;
+            border-radius: 8px;
+        }
+
+        .progress-text {
+            font-size: 0.9rem;
+            font-weight: bold;
+        }
+
+        .progress-count {
+            color: var(--neon-blue);
+            font-size: 1.1rem;
+        }
+
+        .action-item {
+            display: flex;
+            align-items: center;
+            background: rgba(30, 30, 50, 0.7);
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .action-item:hover:not(.completed):not(.disabled) {
+            border-color: rgba(0, 255, 255, 0.3);
+            background: rgba(40, 40, 60, 0.8);
+            transform: translateY(-2px);
+        }
+
+        .action-item.completed {
+            background: rgba(16, 185, 129, 0.1);
+            border-color: rgba(16, 185, 129, 0.3);
+        }
+
+        .action-item.disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .action-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, rgba(0, 100, 255, 0.2), rgba(139, 92, 246, 0.2));
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 12px;
+            font-size: 1.2rem;
+            color: var(--neon-blue);
+            flex-shrink: 0;
+        }
+
+        .action-info {
+            flex-grow: 1;
+            text-align: left;
+        }
+
+        .action-title {
+            font-size: 0.95rem;
+            font-weight: 600;
+            margin-bottom: 3px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .action-desc {
+            font-size: 0.8rem;
+            opacity: 0.7;
+        }
+
+        .action-btn {
+            background: linear-gradient(135deg, var(--btn-primary), var(--accent-purple));
+            color: white;
+            border: none;
+            border-radius: 6px;
+            padding: 8px 16px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .action-btn:hover:not(.completed):not(.disabled) {
+            background: linear-gradient(135deg, var(--btn-hover), #9b75ff);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .action-item.completed .action-btn {
+            background: var(--btn-complete);
+            cursor: default;
+        }
+
+        .action-item.disabled .action-btn {
+            background: #6b7280;
+            cursor: not-allowed;
+        }
+
+        .status-indicator {
+            width: 24px;
+            height: 24px;
+            margin-left: 10px;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .status-pending {
+            color: #f59e0b;
+            font-size: 1rem;
+        }
+
+        .status-completed {
+            color: var(--btn-complete);
+            font-size: 1rem;
+        }
+
+        .status-loading {
+            color: var(--neon-blue);
+            font-size: 0.9rem;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .unlock-container {
+            margin-top: 25px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .unlock-btn {
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 14px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .unlock-btn:disabled {
+            background: #4b5563;
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .unlock-btn:not(:disabled):hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(59, 130, 246, 0.4);
+        }
+
+        .unlock-btn.active {
+            background: linear-gradient(135deg, #10b981, #3b82f6);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4); }
+            70% { box-shadow: 0 0 0 10px rgba(16, 185, 129, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: rgba(30, 30, 50, 0.95);
+            color: white;
+            padding: 12px 20px;
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            z-index: 1000;
+            transition: transform 0.4s ease;
+            max-width: 90%;
+            text-align: center;
+            border-left: 4px solid var(--btn-complete);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .toast.show {
+            transform: translateX(-50%) translateY(0);
+        }
+
+        .footer {
+            margin-top: 20px;
+            font-size: 0.8rem;
+            opacity: 0.6;
+            text-align: center;
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 15px;
+            }
+            
+            h1 {
+                font-size: 1.5rem;
+            }
+            
+            .action-item {
+                padding: 10px;
+            }
+            
+            .action-icon {
+                width: 36px;
+                height: 36px;
+                margin-right: 10px;
+                font-size: 1rem;
+            }
+            
+            .action-btn {
+                padding: 6px 12px;
+                font-size: 0.8rem;
+            }
+            
+            .action-title {
+                font-size: 0.9rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1><i class="fas fa-unlock-alt"></i> UNLOCK CONTENT</h1>
+            <p class="subtitle">Selesaikan semua tugas untuk membuka akses</p>
+            
+            <div class="warning">
+                <i class="fas fa-exclamation-triangle"></i> 
+                <span>Setelah menyelesaikan semua tugas, kamu akan diarahkan ke link tujuan.</span>
+            </div>
+        </div>
+
+        <!-- Progress -->
+        <div class="progress-container">
+            <div class="progress-text"><i class="fas fa-tasks"></i> Progress Tugas:</div>
+            <div class="progress-text">
+                <span id="progress-count">0</span> / <span id="total-actions">4</span> Selesai
+            </div>
+        </div>
+
+        <!-- Action List -->
+        <div id="actions-list">
+            <!-- Akan di-generate oleh JavaScript -->
+        </div>
+
+        <!-- Unlock Button -->
+        <div class="unlock-container">
+            <button class="unlock-btn" id="unlock-btn" disabled>
+                <i class="fas fa-lock" id="lock-icon"></i>
+                <span id="unlock-text">LENGKAPI SEMUA TUGAS DULU</span>
+            </button>
+        </div>
+
+        <div class="footer">
+            <p><i class="far fa-clock"></i> Setiap tugas memerlukan waktu verifikasi otomatis (10 detik)</p>
+            <p>© Sub4Sub System - URL Tujuan Tersembunyi</p>
+        </div>
+    </div>
+
+    <!-- Toast -->
+    <div class="toast" id="toast">
+        <i class="fas fa-check-circle"></i>
+        <div id="toast-message">Tugas selesai!</div>
+    </div>
+
+    <script>
+        // Konfigurasi dengan ikon FA
+        const CONFIG = {
+            totalActions: 4,
+            timerDuration: 10, // detik (tidak ditampilkan)
+            defaultRedirectUrl: "https://github.com/NandSki",
+            actions: [
+                {
+                    id: "youtube",
+                    title: "Subscribe YouTube",
+                    desc: "Subscribe & nyalakan notifikasi",
+                    icon: "fab fa-youtube",
+                    url: "https://www.youtube.com/@NandSkie",
+                    completed: false,
+                    btnIcon: "fas fa-external-link-alt"
+                },
+                {
+                    id: "instagram",
+                    title: "Follow Instagram",
+                    desc: "Follow akun Instagram kami",
+                    icon: "fab fa-instagram",
+                    url: "https://www.instagram.com/nandz.404?igsh=Ymdjcjd5Z3RobjZq",
+                    completed: false,
+                    btnIcon: "fas fa-external-link-alt"
+                },
+                {
+                    id: "whatsapp",
+                    title: "Join Saluran WA",
+                    desc: "Bergabung dengan komunitas",
+                    icon: "fab fa-whatsapp",
+                    url: "https://whatsapp.com/channel/0029VayiXSpBKfi2d9flAT0N",
+                    completed: false,
+                    btnIcon: "fas fa-external-link-alt"
+                },
+                {
+                    id: "like",
+                    title: "Like & Comment",
+                    desc: "Like video terbaru kami",
+                    icon: "fas fa-thumbs-up",
+                    url: "https://youtu.be/zUpH62awHrk?si=ZwMItn_T7gHRaKPZ",
+                    completed: false,
+                    btnIcon: "fas fa-external-link-alt"
+                }
+            ]
+        };
+
+        // State
+        let completedActions = 0;
+        let timers = {};
+        let redirectUrl = CONFIG.defaultRedirectUrl;
+        
+        // DOM Elements
+        const actionsList = document.getElementById('actions-list');
+        const unlockBtn = document.getElementById('unlock-btn');
+        const unlockText = document.getElementById('unlock-text');
+        const lockIcon = document.getElementById('lock-icon');
+        const progressCount = document.getElementById('progress-count');
+        const totalActions = document.getElementById('total-actions');
+        const toast = document.getElementById('toast');
+        const toastMessage = document.getElementById('toast-message');
+        
+        // Inisialisasi
+        function init() {
+            // Parse URL parameter (SILENT - tidak ditampilkan)
+            const urlParams = new URLSearchParams(window.location.search);
+            const directParam = urlParams.get('direct');
+            
+            // Process URL parameter secara diam-diam
+            processUrlParamSilently(directParam);
+            
+            // Set total actions
+            totalActions.textContent = CONFIG.totalActions;
+            
+            // Buat daftar aksi
+            createActionList();
+            
+            // Inisialisasi efek meteor
+            initMeteorEffect();
+            
+            // Update progress
+            updateProgress();
+        }
+        
+        // Process URL parameter secara diam-diam (tidak ditampilkan)
+        function processUrlParamSilently(param) {
+            if (!param) {
+                // Tidak ada parameter, gunakan default
+                return;
+            }
+            
+            try {
+                // Decode URL
+                const decodedUrl = decodeURIComponent(param);
+                
+                // Normalize URL - tambahkan https:// jika tidak ada protokol
+                let normalizedUrl = decodedUrl;
+                
+                // Cek jika URL sudah memiliki protokol
+                if (!decodedUrl.startsWith('http://') && !decodedUrl.startsWith('https://')) {
+                    // Tambahkan https:// secara otomatis
+                    normalizedUrl = 'https://' + decodedUrl;
+                }
+                
+                // Validasi URL secara diam-diam
+                if (isValidUrl(normalizedUrl)) {
+                    redirectUrl = normalizedUrl;
+                }
+                // Jika tidak valid, tetap gunakan default (tidak perlu error message)
+                
+            } catch (e) {
+                // Error silent, tetap gunakan default URL
+                console.log("URL parsing error, using default");
+            }
+        }
+        
+        // Validasi URL - lebih fleksibel
+        function isValidUrl(string) {
+            try {
+                const url = new URL(string);
+                return url.protocol === "http:" || url.protocol === "https:";
+            } catch (_) {
+                return false;
+            }
+        }
+        
+        // Buat daftar aksi dengan ikon FA
+        function createActionList() {
+            CONFIG.actions.forEach(action => {
+                const actionItem = document.createElement('div');
+                actionItem.className = 'action-item';
+                actionItem.id = `action-${action.id}`;
+                
+                actionItem.innerHTML = `
+                    <div class="action-icon">
+                        <i class="${action.icon}"></i>
+                    </div>
+                    <div class="action-info">
+                        <div class="action-title">
+                            <i class="${action.icon} fa-xs"></i> ${action.title}
+                        </div>
+                        <div class="action-desc">${action.desc}</div>
+                    </div>
+                    <button class="action-btn" id="btn-${action.id}">
+                        <i class="${action.btnIcon}"></i> Lakukan
+                    </button>
+                    <div class="status-indicator" id="status-${action.id}">
+                        <i class="fas fa-clock status-pending"></i>
+                    </div>
+                `;
+                
+                // Event listener untuk tombol aksi
+                const actionBtn = actionItem.querySelector(`#btn-${action.id}`);
+                actionBtn.addEventListener('click', () => startAction(action.id));
+                
+                actionsList.appendChild(actionItem);
+            });
+        }
+        
+        // Mulai aksi
+        function startAction(actionId) {
+            const action = CONFIG.actions.find(a => a.id === actionId);
+            const actionItem = document.getElementById(`action-${actionId}`);
+            const actionBtn = document.getElementById(`btn-${actionId}`);
+            const statusIndicator = document.getElementById(`status-${actionId}`);
+            
+            // Jika sudah selesai atau sedang proses, jangan lakukan apa-apa
+            if (action.completed || timers[actionId]) return;
+            
+            // Buka URL di tab baru
+            window.open(action.url, '_blank');
+            
+            // Update UI ke status loading
+            actionItem.classList.add('disabled');
+            actionBtn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Verifikasi...`;
+            statusIndicator.innerHTML = `<i class="fas fa-spinner status-loading"></i>`;
+            
+            // Timer 10 detik (tanpa ditampilkan)
+            setTimeout(() => {
+                // Selesai
+                action.completed = true;
+                completedActions++;
+                
+                // Update UI
+                actionItem.classList.remove('disabled');
+                actionItem.classList.add('completed');
+                actionBtn.innerHTML = `<i class="fas fa-check"></i> Selesai`;
+                statusIndicator.innerHTML = `<i class="fas fa-check-circle status-completed"></i>`;
+                
+                // Update progress
+                updateProgress();
+                
+                // Tampilkan notifikasi
+                showToast(`${action.title} berhasil diselesaikan!`);
+                
+                // Hapus timer dari memori
+                delete timers[actionId];
+                
+                // Cek jika semua aksi selesai
+                if (completedActions === CONFIG.totalActions) {
+                    enableUnlockButton();
+                }
+            }, CONFIG.timerDuration * 1000);
+        }
+        
+        // Update progress
+        function updateProgress() {
+            progressCount.textContent = completedActions;
+        }
+        
+        // Aktifkan tombol unlock
+        function enableUnlockButton() {
+            unlockBtn.disabled = false;
+            unlockBtn.classList.add('active');
+            lockIcon.className = "fas fa-unlock-alt";
+            unlockText.textContent = "UNLOCK SEKARANG!";
+            
+            // Event untuk redirect
+            unlockBtn.addEventListener('click', redirectToUrl);
+        }
+        
+        // Redirect ke URL tujuan (SILENT - tidak ditampilkan)
+        function redirectToUrl() {
+            unlockBtn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Mengarahkan...`;
+            
+            setTimeout(() => {
+                window.location.href = redirectUrl;
+            }, 1000);
+        }
+        
+        // Tampilkan toast
+        function showToast(message) {
+            toastMessage.textContent = message;
+            toast.classList.add('show');
+            
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+        
+        // Inisialisasi efek meteor
+        function initMeteorEffect() {
+            const meteorCount = 15;
+            
+            for (let i = 0; i < meteorCount; i++) {
+                createMeteor(i);
+            }
+        }
+        
+        // Buat meteor
+        function createMeteor(index) {
+            const meteor = document.createElement('div');
+            meteor.className = 'meteor';
+            
+            // Posisi dan delay acak
+            const startX = Math.random() * 10;
+            const startY = Math.random() * 10;
+            const delay = Math.random() * 20;
+            const duration = 1 + Math.random() * 2;
+            
+            // Set posisi awal
+            meteor.style.left = `${startX}%`;
+            meteor.style.top = `${startY}%`;
+            
+            // Set animasi
+            meteor.style.animation = `meteorFall ${duration}s linear ${delay}s infinite`;
+            
+            // Tambahkan ke body
+            document.body.appendChild(meteor);
+            
+            // Tambahkan keyframes jika belum ada
+            if (!document.getElementById('meteor-keyframes')) {
+                const style = document.createElement('style');
+                style.id = 'meteor-keyframes';
+                style.textContent = `
+                    @keyframes meteorFall {
+                        0% {
+                            transform: translateX(0) translateY(0) rotate(45deg);
+                            opacity: 0;
+                        }
+                        10% {
+                            opacity: 0.8;
+                        }
+                        90% {
+                            opacity: 0.8;
+                        }
+                        100% {
+                            transform: translateX(100vw) translateY(100vh) rotate(45deg);
+                            opacity: 0;
+                        }
+                    }
+                `;
+                document.head.appendChild(style);
+            }
+        }
+        
+        // Jalankan saat halaman dimuat
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>
